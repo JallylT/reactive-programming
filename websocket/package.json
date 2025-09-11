@@ -1,0 +1,16 @@
+{
+  "name": "tp-websocket-chat",
+  "version": "1.0.0",
+  "description": "Chat minimaliste avec WebSockets",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["websocket", "chat", "real-time"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "ws": "^8.14.0"
+  }
+}
