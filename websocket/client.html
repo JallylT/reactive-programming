@@ -957,7 +957,10 @@
         <div id="chatInterface" class="chat-interface">
             <div id="currentUser" class="current-user"></div>
             <div style="text-align: center; margin-bottom: 15px; color: var(--text-username); font-weight: bold;">
-                🏠 Salon: <span id="currentRoom"></span>
+                🏠 Salon: <span id="currentRoom"></span> 
+                <span style="margin-left: 15px; color: var(--text-accent);">
+                    👥 <span id="userCount">0</span> connecté(s)
+                </span>
             </div>
 
             <div id="messages"></div>
@@ -992,6 +995,7 @@
         const setUsernameButton = document.getElementById('setUsernameButton');
         const currentUserDiv = document.getElementById('currentUser');
         const currentRoomDiv = document.getElementById('currentRoom');
+        const userCountDiv = document.getElementById('userCount');
         const themeToggle = document.getElementById('themeToggle');
         const backButton = document.getElementById('backButton');
         const roomSelect = document.getElementById('roomSelect');
@@ -1356,6 +1360,12 @@
                                     roomSelect.value = data.newRoom;
                                     displayMessage(`✨ Salon "${data.newRoom}" créé !`, 'system');
                                 }
+                                break;
+
+                            case 'userCount':
+                                // Mettre à jour le nombre d'utilisateurs connectés
+                                userCountDiv.textContent = data.count;
+                                console.log('👥 Nombre d\'utilisateurs dans le salon:', data.count);
                                 break;
 
                             case 'system':

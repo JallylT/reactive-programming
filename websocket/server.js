@@ -23,6 +23,22 @@ function broadcastRoomList(newRoom = null) {
     });
 }
 
+// Fonction pour envoyer le nombre d'utilisateurs dans un salon
+function broadcastUserCount(roomName) {
+    const roomClients = rooms.get(roomName);
+    if (roomClients) {
+        const userCount = roomClients.size;
+        roomClients.forEach(function each(client) {
+            if (client.readyState === WebSocket.OPEN && client.isAuthenticated) {
+                client.send(JSON.stringify({
+                    type: 'userCount',
+                    count: userCount
+                }));
+            }
+        });
+    }
+}
+
 // Gestion des nouvelles connexions
 wss.on('connection', function connection(ws) {
     console.log('Nouveau client connecté');
@@ -108,6 +124,9 @@ wss.on('connection', function connection(ws) {
                     room: roomName
                 }));
 
+                // Envoyer le nombre d'utilisateurs dans le salon
+                broadcastUserCount(roomName);
+
                 // Notifier les autres utilisateurs du même salon (message chiffré)
                 rooms.get(roomName).forEach(function each(client) {
                     if (client !== ws && client.readyState === WebSocket.OPEN && client.isAuthenticated) {
@@ -160,10 +179,15 @@ wss.on('connection', function connection(ws) {
         if (ws.isAuthenticated && ws.room) {
             console.log(`Client déconnecté du salon: ${ws.room}`);
 
+            const roomName = ws.room; // Sauvegarder le nom du salon
+            
             // Retirer le client du salon
-            const roomClients = rooms.get(ws.room);
+            const roomClients = rooms.get(roomName);
             if (roomClients) {
                 roomClients.delete(ws);
+                
+                // Mettre à jour le compteur d'utilisateurs
+                broadcastUserCount(roomName);
                 
                 // Notifier les autres utilisateurs du même salon (message chiffré si fourni)
                 roomClients.forEach(function each(client) {
@@ -178,7 +202,7 @@ wss.on('connection', function connection(ws) {
                 
                 // Supprimer le salon s'il est vide
                 if (roomClients.size === 0) {
-                    rooms.delete(ws.room);
+                    rooms.delete(roomName);
                 }
             }
         } else {
