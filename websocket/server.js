@@ -1,174 +1,198 @@
 const WebSocket = require('ws');
 
-// Configuration du serveur
-const PORT = 8080;
+// Création du serveur WebSocket sur le port 8080
+const wss = new WebSocket.Server({ port: 8080 });
 
-// Création du serveur WebSocket
-const wss = new WebSocket.Server({ 
-    port: PORT,
-    perMessageDeflate: false
-});
+console.log('Serveur WebSocket en écoute sur le port 8080...');
 
-// Set pour stocker les connexions actives
-const clients = new Set();
+// Gestion des salons
+const rooms = new Map(); // Map<roomName, Set<ws>>
+const availableRooms = new Set(['Général', 'Jeux', 'Détente']); // Salons par défaut
 
-// Fonction utilitaire pour logger avec timestamp
-function log(message) {
-    const timestamp = new Date().toLocaleTimeString();
-    console.log(`[${timestamp}] ${message}`);
-}
-
-// Fonction pour broadcaster un message à tous les clients connectés
-function broadcast(message, excludeClient = null) {
-    const messageStr = JSON.stringify(message);
-    let sentCount = 0;
-    
-    clients.forEach(client => {
-        // Exclure l'expéditeur si spécifié
-        if (excludeClient && client === excludeClient) {
-            return;
-        }
-        
-        // Vérifier que la connexion est ouverte
+// Fonction pour broadcast la liste des salons à tous les clients
+function broadcastRoomList(newRoom = null) {
+    const roomList = Array.from(availableRooms);
+    wss.clients.forEach(function each(client) {
         if (client.readyState === WebSocket.OPEN) {
-            client.send(messageStr);
-            sentCount++;
-        } else {
-            // Nettoyer les connexions fermées
-            clients.delete(client);
+            client.send(JSON.stringify({
+                type: 'roomList',
+                rooms: roomList,
+                newRoom: newRoom // Indiquer quel salon vient d'être créé
+            }));
         }
     });
-    
-    return sentCount;
 }
 
 // Gestion des nouvelles connexions
-wss.on('connection', (ws, request) => {
-    // Informations sur la connexion
-    const clientIP = request.socket.remoteAddress;
-    const clientId = Math.random().toString(36).substr(2, 9);
+wss.on('connection', function connection(ws) {
+    console.log('Nouveau client connecté');
+
+    // Propriétés du client
+    ws.username = null; // Stocke le username chiffré
+    ws.room = null;
+    ws.isAuthenticated = false;
     
-    log(`🟢 Nouveau client connecté (ID: ${clientId}, IP: ${clientIP})`);
-    log(`📊 Total clients connectés: ${clients.size + 1}`);
-    
-    ws.clientId = clientId;
-    clients.add(ws);
-    
-    const welcomeMessage = {
-        type: 'system',
-        content: 'Bienvenue dans le chat ! Vous êtes maintenant connecté.',
-        timestamp: new Date().toISOString(),
-        clientId: 'system'
-    };
-    ws.send(JSON.stringify(welcomeMessage));
-    
-    const joinMessage = {
-        type: 'user-joined',
-        content: `Un nouvel utilisateur (${clientId}) a rejoint le chat`,
-        timestamp: new Date().toISOString(),
-        clientId: 'system'
-    };
-    broadcast(joinMessage, ws);
-    
-    ws.on('message', (data) => {
+    // Envoyer la liste des salons au nouveau client
+    ws.send(JSON.stringify({
+        type: 'roomList',
+        rooms: Array.from(availableRooms)
+    }));
+
+    // Gestion des messages reçus du client
+    ws.on('message', function incoming(data) {
         try {
-            const messageData = JSON.parse(data.toString());
-            
-            log(`📨 Message reçu de ${clientId}: ${messageData.content}`);
-            
-            const broadcastMessage = {
-                type: 'message',
-                content: messageData.content,
-                username: messageData.username || `Utilisateur-${clientId}`,
-                timestamp: new Date().toISOString(),
-                clientId: clientId
-            };
-            
-            const sentCount = broadcast(broadcastMessage, ws);
-            log(`📤 Message diffusé à ${sentCount} client(s)`);
-            
-            const confirmMessage = {
-                type: 'message-sent',
-                content: 'Message envoyé avec succès',
-                timestamp: new Date().toISOString(),
-                originalMessage: broadcastMessage
-            };
-            ws.send(JSON.stringify(confirmMessage));
-            
+            const messageData = JSON.parse(data);
+
+            // Gestion de la création de salon
+            if (messageData.type === 'createRoom') {
+                const roomName = messageData.roomName.trim();
+                
+                if (roomName.length === 0) {
+                    ws.send(JSON.stringify({
+                        type: 'error',
+                        message: 'Le nom du salon ne peut pas être vide.'
+                    }));
+                    return;
+                }
+                
+                if (availableRooms.has(roomName)) {
+                    ws.send(JSON.stringify({
+                        type: 'error',
+                        message: 'Ce salon existe déjà.'
+                    }));
+                    return;
+                }
+                
+                availableRooms.add(roomName);
+                broadcastRoomList(roomName); // Envoyer le nom du nouveau salon
+                
+                console.log(`Nouveau salon créé: ${roomName}`);
+                return;
+            }
+
+            // Si l'utilisateur n'est pas encore authentifié, traiter le pseudonyme et le salon
+            if (!ws.isAuthenticated && messageData.type === 'join') {
+                const encryptedUsername = messageData.encryptedUsername; // Username chiffré
+                const roomName = messageData.room;
+
+                // Vérifier si le salon existe
+                if (!availableRooms.has(roomName)) {
+                    ws.send(JSON.stringify({
+                        type: 'error',
+                        message: 'Ce salon n\'existe pas.'
+                    }));
+                    return;
+                }
+
+                // Note: On ne peut pas vérifier l'unicité du username car il est chiffré
+                // Chaque client aura son propre username chiffré unique
+
+                // Assigner le username chiffré et le salon
+                ws.username = encryptedUsername;
+                ws.room = roomName;
+                ws.isAuthenticated = true;
+
+                // Initialiser le salon s'il n'existe pas dans la Map
+                if (!rooms.has(roomName)) {
+                    rooms.set(roomName, new Set());
+                }
+                
+                // Ajouter le client au salon
+                rooms.get(roomName).add(ws);
+
+                console.log(`Utilisateur connecté au salon: ${roomName}`);
+
+                // Confirmer l'authentification
+                ws.send(JSON.stringify({
+                    type: 'authenticated',
+                    room: roomName
+                }));
+
+                // Notifier les autres utilisateurs du même salon (message chiffré)
+                rooms.get(roomName).forEach(function each(client) {
+                    if (client !== ws && client.readyState === WebSocket.OPEN && client.isAuthenticated) {
+                        client.send(JSON.stringify({
+                            type: 'system',
+                            encryptedMessage: messageData.joinMessage, // Message chiffré
+                            timestamp: new Date().toLocaleTimeString()
+                        }));
+                    }
+                });
+
+                return;
+            }
+
+            // Si l'utilisateur n'est pas authentifié et essaie d'envoyer un message
+            if (!ws.isAuthenticated) {
+                ws.send(JSON.stringify({
+                    type: 'error',
+                    message: 'Vous devez d\'abord rejoindre un salon.'
+                }));
+                return;
+            }
+
+            // Traitement des messages normaux (chiffrés)
+            if (messageData.type === 'message') {
+                console.log(`Message dans le salon ${ws.room}`);
+
+                // Broadcast du message chiffré uniquement aux clients du même salon
+                const roomClients = rooms.get(ws.room);
+                if (roomClients) {
+                    roomClients.forEach(function each(client) {
+                        if (client.readyState === WebSocket.OPEN && client.isAuthenticated) {
+                            client.send(JSON.stringify({
+                                type: 'message',
+                                encryptedMessage: messageData.encryptedMessage, // Message chiffré
+                                encryptedUsername: ws.username, // Username chiffré
+                                timestamp: new Date().toLocaleTimeString()
+                            }));
+                        }
+                    });
+                }
+            }
         } catch (error) {
-            log(`❌ Erreur lors du traitement du message de ${clientId}: ${error.message}`);
-            
-            const errorMessage = {
-                type: 'error',
-                content: 'Format de message invalide',
-                timestamp: new Date().toISOString(),
-                clientId: 'system'
-            };
-            ws.send(JSON.stringify(errorMessage));
+            console.error('Erreur lors du traitement du message:', error);
         }
     });
-    
-    ws.on('close', (code, reason) => {
-        log(`🔴 Client ${clientId} déconnecté (Code: ${code}, Raison: ${reason || 'Non spécifiée'})`);
-        
-        clients.delete(ws);
-        log(`📊 Total clients connectés: ${clients.size}`);
-        
-        const leaveMessage = {
-            type: 'user-left',
-            content: `L'utilisateur ${clientId} a quitté le chat`,
-            timestamp: new Date().toISOString(),
-            clientId: 'system'
-        };
-        broadcast(leaveMessage);
-    });
-    
-    ws.on('error', (error) => {
-        log(`❌ Erreur WebSocket pour ${clientId}: ${error.message}`);
-        clients.delete(ws);
-    });
-    
-    const pingInterval = setInterval(() => {
-        if (ws.readyState === WebSocket.OPEN) {
-            ws.ping();
+
+    // Gestion de la déconnexion
+    ws.on('close', function close() {
+        if (ws.isAuthenticated && ws.room) {
+            console.log(`Client déconnecté du salon: ${ws.room}`);
+
+            // Retirer le client du salon
+            const roomClients = rooms.get(ws.room);
+            if (roomClients) {
+                roomClients.delete(ws);
+                
+                // Notifier les autres utilisateurs du même salon (message chiffré si fourni)
+                roomClients.forEach(function each(client) {
+                    if (client.readyState === WebSocket.OPEN && client.isAuthenticated) {
+                        client.send(JSON.stringify({
+                            type: 'userLeft',
+                            encryptedUsername: ws.username,
+                            timestamp: new Date().toLocaleTimeString()
+                        }));
+                    }
+                });
+                
+                // Supprimer le salon s'il est vide
+                if (roomClients.size === 0) {
+                    rooms.delete(ws.room);
+                }
+            }
         } else {
-            clearInterval(pingInterval);
-            clients.delete(ws);
+            console.log('Client déconnecté');
         }
-    }, 30000);
-    
-    ws.on('close', () => clearInterval(pingInterval));
-});
+    });
 
-wss.on('error', (error) => {
-    log(`❌ Erreur du serveur WebSocket: ${error.message}`);
-});
-
-function displayStats() {
-    log(`📊 Statistiques: ${clients.size} client(s) connecté(s)`);
-}
-
-setInterval(displayStats, 60000);
-
-process.on('SIGINT', () => {
-    log('🛑 Arrêt du serveur en cours...');
-    
-    const closeMessage = {
-        type: 'server-shutdown',
-        content: 'Le serveur va s\'arrêter. Connexion fermée.',
-        timestamp: new Date().toISOString(),
-        clientId: 'system'
-    };
-    
-    broadcast(closeMessage);
-    
-    wss.close(() => {
-        log('✅ Serveur fermé proprement');
-        process.exit(0);
+    // Gestion des erreurs
+    ws.on('error', function error(err) {
+        console.error('Erreur WebSocket:', err);
     });
 });
 
-log('🚀 Démarrage du serveur WebSocket...');
-log(`🌐 Serveur en écoute sur ws://localhost:${PORT}`);
-log('💡 Appuyez sur Ctrl+C pour arrêter le serveur');
-log('═'.repeat(50));
+// Gestion des erreurs du serveur
+wss.on('error', function error(err) {
+    console.error('Erreur du serveur WebSocket:', err);
+});
