@@ -342,24 +342,6 @@
             overflow: hidden;
         }
 
-        .username-setup button::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: var(--button-hover);
-            border-radius: 50%;
-            transition: all 0.3s ease;
-            transform: translate(-50%, -50%);
-        }
-
-        .username-setup button:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-
         .username-setup button:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(65, 105, 225, 0.4);
@@ -483,6 +465,115 @@
             text-align: center;
         }
 
+        .message.file {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 4px solid #2196F3;
+        }
+
+        .message.file.own {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border-right: 4px solid #4CAF50;
+            border-left: none;
+        }
+
+        .file-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background: var(--button-secondary);
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .file-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .file-info {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .file-preview {
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .preview-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .pdf-preview, .text-preview {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pdf-icon, .text-icon {
+            font-size: 48px;
+        }
+
+        .text-content {
+            width: 100%;
+            min-height: 100px;
+            max-height: 300px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: vertical;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .text-content:focus {
+            outline: 2px solid var(--button-secondary);
+            outline-offset: 2px;
+        }
+
+        .preview-button {
+            padding: 10px 20px;
+            background: var(--button-secondary);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(65, 105, 225, 0.3);
+        }
+
+        .preview-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(65, 105, 225, 0.4);
+        }
+
         .username {
             font-weight: bold;
             margin-right: 10px;
@@ -498,6 +589,34 @@
             display: flex;
             gap: 15px;
             align-items: center;
+        }
+
+        .file-button {
+            padding: 18px 20px;
+            background: var(--button-primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(50, 205, 50, 0.3);
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-button:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 6px 20px rgba(50, 205, 50, 0.4);
+        }
+
+        .file-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         #messageInput {
@@ -777,6 +896,98 @@
             box-shadow: 0 8px 25px var(--shadow-color);
         }
 
+        /* Alertes personnalisées */
+        .custom-alert {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: var(--bg-chat);
+            padding: 30px;
+            border-radius: 25px;
+            border: 3px solid var(--border-color);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            z-index: 10001;
+            min-width: 300px;
+            max-width: 500px;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .custom-alert.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .custom-alert-content {
+            text-align: center;
+        }
+
+        .custom-alert-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .custom-alert-message {
+            color: var(--text-primary);
+            font-size: 18px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .custom-alert-button {
+            padding: 12px 30px;
+            background: var(--button-primary);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(50, 205, 50, 0.3);
+        }
+
+        .custom-alert-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(50, 205, 50, 0.4);
+        }
+
+        /* Checkbox style personnalisé */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: var(--button-primary);
+        }
+
+        .checkbox-container label {
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 16px;
+        }
+
+        /* Style pour les options de salon */
+        .room-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .room-option .lock-icon {
+            font-size: 14px;
+        }
+
         /* Style amélioré pour le formulaire de connexion */
         .username-form-row {
             display: flex;
@@ -945,10 +1156,36 @@
                 <h2>Créer un nouveau salon</h2>
                 <div class="modal-content">
                     <input type="text" id="newRoomInput" placeholder="Nom du salon..." maxlength="30">
+                    
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="privateRoomCheckbox">
+                        <label for="privateRoomCheckbox">🔒 Salon privé</label>
+                    </div>
+                    
+                    <div id="passwordContainer" style="display: none; margin-top: 10px;">
+                        <input type="password" id="roomPasswordInput" placeholder="Mot de passe du salon..." maxlength="50">
+                    </div>
                 </div>
                 <div class="modal-buttons">
                     <button class="modal-button primary" id="confirmCreateRoom">✅ Créer</button>
                     <button class="modal-button secondary" id="cancelCreateRoom">❌ Annuler</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal pour mot de passe salon privé -->
+        <div id="passwordModal" class="modal-overlay">
+            <div class="modal">
+                <h2>🔒 Salon privé</h2>
+                <div class="modal-content">
+                    <p style="color: var(--text-primary); margin-bottom: 15px;">
+                        Ce salon est protégé par un mot de passe.
+                    </p>
+                    <input type="password" id="roomPasswordPrompt" placeholder="Entrez le mot de passe...">
+                </div>
+                <div class="modal-buttons">
+                    <button class="modal-button primary" id="confirmPassword">✅ Valider</button>
+                    <button class="modal-button secondary" id="cancelPassword">❌ Annuler</button>
                 </div>
             </div>
         </div>
@@ -966,6 +1203,8 @@
             <div id="messages"></div>
 
             <div class="input-container">
+                <input type="file" id="fileInput" style="display: none;" accept=".png,.jpg,.jpeg,.gif,.pdf,.txt,.doc,.docx">
+                <button id="fileButton" class="file-button" title="Envoyer un fichier" disabled>📎</button>
                 <input type="text" id="messageInput" placeholder="Partagez vos pensées avec les villageois... 💭" disabled>
                 <button id="sendButton" disabled>📨 Envoyer</button>
             </div>
@@ -988,6 +1227,8 @@
         const messagesDiv = document.getElementById('messages');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
+        const fileButton = document.getElementById('fileButton');
+        const fileInput = document.getElementById('fileInput');
         const statusDiv = document.getElementById('status');
         const usernameSetup = document.getElementById('usernameSetup');
         const chatInterface = document.getElementById('chatInterface');
@@ -1004,8 +1245,59 @@
         const newRoomInput = document.getElementById('newRoomInput');
         const confirmCreateRoom = document.getElementById('confirmCreateRoom');
         const cancelCreateRoom = document.getElementById('cancelCreateRoom');
+        const privateRoomCheckbox = document.getElementById('privateRoomCheckbox');
+        const passwordContainer = document.getElementById('passwordContainer');
+        const roomPasswordInput = document.getElementById('roomPasswordInput');
+        const passwordModal = document.getElementById('passwordModal');
+        const roomPasswordPrompt = document.getElementById('roomPasswordPrompt');
+        const confirmPassword = document.getElementById('confirmPassword');
+        const cancelPassword = document.getElementById('cancelPassword');
+
+        let pendingPrivateRoom = null; // Salon en attente de mot de passe
+
+        // ========== ALERTES PERSONNALISÉES ==========
+        
+        function showCustomAlert(message, icon = '⚠️') {
+            return new Promise((resolve) => {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'custom-alert';
+                alertDiv.innerHTML = `
+                    <div class="custom-alert-content">
+                        <div class="custom-alert-icon">${icon}</div>
+                        <div class="custom-alert-message">${message}</div>
+                        <button class="custom-alert-button">OK</button>
+                    </div>
+                `;
+                
+                document.body.appendChild(alertDiv);
+                
+                // Animation d'entrée
+                setTimeout(() => alertDiv.classList.add('show'), 10);
+                
+                const button = alertDiv.querySelector('.custom-alert-button');
+                button.onclick = () => {
+                    alertDiv.classList.remove('show');
+                    setTimeout(() => {
+                        document.body.removeChild(alertDiv);
+                        resolve();
+                    }, 300);
+                };
+            });
+        }
 
         // ========== CHIFFREMENT DE BOUT EN BOUT ==========
+        
+        // Hash un mot de passe avec SHA-256
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password + '-room-password-salt-2024');
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            
+            // Convertir en string hexadécimal
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            return hashHex;
+        }
         
         // Générer une clé de chiffrement symétrique unique pour ce salon
         async function generateEncryptionKey(roomName) {
@@ -1081,6 +1373,67 @@
             }
         }
 
+        // Chiffrer un fichier (ArrayBuffer)
+        async function encryptFile(arrayBuffer, key) {
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            
+            const encryptedData = await crypto.subtle.encrypt(
+                { name: 'AES-GCM', iv: iv },
+                key,
+                arrayBuffer
+            );
+            
+            // Convertir en base64 sans utiliser le spread operator
+            const encryptedArray = new Uint8Array(encryptedData);
+            let encryptedBinary = '';
+            const chunkSize = 8192;
+            for (let i = 0; i < encryptedArray.length; i += chunkSize) {
+                const chunk = encryptedArray.slice(i, i + chunkSize);
+                encryptedBinary += String.fromCharCode.apply(null, chunk);
+            }
+            const encryptedBase64 = btoa(encryptedBinary);
+            
+            let ivBinary = '';
+            for (let i = 0; i < iv.length; i += chunkSize) {
+                const chunk = iv.slice(i, i + chunkSize);
+                ivBinary += String.fromCharCode.apply(null, chunk);
+            }
+            const ivBase64 = btoa(ivBinary);
+            
+            return {
+                encrypted: encryptedBase64,
+                iv: ivBase64
+            };
+        }
+
+        // Déchiffrer un fichier
+        async function decryptFile(encryptedBase64, ivBase64, key) {
+            try {
+                const encryptedBinary = atob(encryptedBase64);
+                const encryptedArray = new Uint8Array(encryptedBinary.length);
+                for (let i = 0; i < encryptedBinary.length; i++) {
+                    encryptedArray[i] = encryptedBinary.charCodeAt(i);
+                }
+                
+                const ivBinary = atob(ivBase64);
+                const iv = new Uint8Array(ivBinary.length);
+                for (let i = 0; i < ivBinary.length; i++) {
+                    iv[i] = ivBinary.charCodeAt(i);
+                }
+                
+                const decryptedData = await crypto.subtle.decrypt(
+                    { name: 'AES-GCM', iv: iv },
+                    key,
+                    encryptedArray
+                );
+                
+                return decryptedData;
+            } catch (error) {
+                console.error('Erreur de déchiffrement de fichier:', error);
+                return null;
+            }
+        }
+
         // ========== GESTION DES SALONS ==========
         
         // Mettre à jour la liste déroulante des salons
@@ -1092,14 +1445,25 @@
             
             rooms.forEach(room => {
                 const option = document.createElement('option');
-                option.value = room;
-                option.textContent = `🏠 ${room}`;
+                option.value = typeof room === 'string' ? room : room.name;
+                const lockIcon = (typeof room === 'object' && room.isPrivate) ? '🔒 ' : '🏠 ';
+                option.textContent = `${lockIcon}${typeof room === 'string' ? room : room.name}`;
+                
+                // Stocker si c'est privé dans un attribut
+                if (typeof room === 'object' && room.isPrivate) {
+                    option.dataset.private = 'true';
+                }
+                
                 roomSelect.appendChild(option);
             });
             
-            // Réselectionner le salon si possible
-            if (currentSelection && rooms.includes(currentSelection)) {
+            // Réselectionner le salon si possible, sinon sélectionner le premier
+            const roomNames = rooms.map(r => typeof r === 'string' ? r : r.name);
+            if (currentSelection && roomNames.includes(currentSelection)) {
                 roomSelect.value = currentSelection;
+            } else if (rooms.length > 0 && !isAuthenticated) {
+                // Sélectionner le premier salon par défaut si on n'est pas encore connecté
+                roomSelect.selectedIndex = 1;
             }
             
             console.log('✅ Liste des salons mise à jour avec', rooms.length, 'salons');
@@ -1109,6 +1473,9 @@
         function openCreateRoomModal() {
             createRoomModal.classList.add('active');
             newRoomInput.value = '';
+            privateRoomCheckbox.checked = false;
+            roomPasswordInput.value = '';
+            passwordContainer.style.display = 'none';
             newRoomInput.focus();
         }
 
@@ -1116,35 +1483,84 @@
         function closeCreateRoomModal() {
             createRoomModal.classList.remove('active');
             newRoomInput.value = '';
+            privateRoomCheckbox.checked = false;
+            roomPasswordInput.value = '';
+            passwordContainer.style.display = 'none';
         }
 
-        // Créer un nouveau salon
-        function createRoom() {
-            const roomName = newRoomInput.value.trim();
+        // Ouvrir la modal de mot de passe
+        function openPasswordModal() {
+            passwordModal.classList.add('active');
+            roomPasswordPrompt.value = '';
+            roomPasswordPrompt.focus();
+        }
+
+        // Fermer la modal de mot de passe
+        function closePasswordModal() {
+            passwordModal.classList.remove('active');
+            roomPasswordPrompt.value = '';
+        }
+
+        // Soumettre le mot de passe pour rejoindre un salon privé
+        async function submitPassword() {
+            const password = roomPasswordPrompt.value.trim();
             
-            if (!roomName) {
-                alert('⚠️ Veuillez entrer un nom de salon valide.');
+            if (!password) {
+                await showCustomAlert('Veuillez entrer un mot de passe.', '⚠️');
                 return;
             }
             
-            if (availableRooms.includes(roomName)) {
-                alert('⚠️ Ce salon existe déjà !');
+            if (pendingPrivateRoom) {
+                const { username, room } = pendingPrivateRoom;
+                closePasswordModal();
+                await joinRoom(username, room, password);
+                // Ne pas réinitialiser pendingPrivateRoom ici, on le fera après succès
+            }
+        }
+
+        // Créer un nouveau salon
+        async function createRoom() {
+            const roomName = newRoomInput.value.trim();
+            const isPrivate = privateRoomCheckbox.checked;
+            const password = roomPasswordInput.value.trim();
+            
+            if (!roomName) {
+                await showCustomAlert('Veuillez entrer un nom de salon valide.', '⚠️');
+                return;
+            }
+            
+            const roomNames = availableRooms.map(r => typeof r === 'string' ? r : r.name);
+            if (roomNames.includes(roomName)) {
+                await showCustomAlert('Ce salon existe déjà !', '⚠️');
+                return;
+            }
+            
+            if (isPrivate && !password) {
+                await showCustomAlert('Veuillez entrer un mot de passe pour le salon privé.', '🔒');
                 return;
             }
             
             if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({
+                const messageData = {
                     type: 'createRoom',
-                    roomName: roomName
-                }));
+                    roomName: roomName,
+                    isPrivate: isPrivate
+                };
+                
+                if (isPrivate) {
+                    messageData.hashedPassword = await hashPassword(password);
+                }
+                
+                ws.send(JSON.stringify(messageData));
                 
                 // Fermer la modal
                 closeCreateRoomModal();
                 
                 // Afficher un message de succès
-                displayMessage(`✨ Salon "${roomName}" créé avec succès !`, 'system');
+                const lockIcon = isPrivate ? '🔒' : '🏠';
+                displayMessage(`✨ Salon ${lockIcon} "${roomName}" créé avec succès !`, 'system');
             } else {
-                alert('⚠️ Connexion au serveur perdue. Veuillez réessayer.');
+                await showCustomAlert('Connexion au serveur perdue. Veuillez réessayer.', '⚠️');
             }
         }
 
@@ -1225,6 +1641,92 @@
             }, 100);
         }
 
+        // Fonction pour afficher un message avec fichier
+        async function displayFileMessage(fileUrl, fileName, fileSize, fileType, username, isOwnMessage = false) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', 'file');
+
+            if (isOwnMessage) {
+                messageElement.classList.add('own');
+            }
+
+            const timestamp = new Date().toLocaleTimeString();
+            const fileSizeKB = (fileSize / 1024).toFixed(2);
+            
+            // Déterminer si on peut prévisualiser
+            const isImage = fileType.startsWith('image/');
+            const isPDF = fileType === 'application/pdf';
+            const isText = fileType.startsWith('text/');
+            
+            let previewHTML = '';
+            
+            if (isImage) {
+                // Prévisualisation d'image
+                previewHTML = `
+                    <div class="file-preview">
+                        <img src="${fileUrl}" alt="${fileName}" class="preview-image" onclick="window.open('${fileUrl}', '_blank')">
+                    </div>
+                `;
+            } else if (isPDF) {
+                // Lien pour ouvrir le PDF dans un nouvel onglet
+                previewHTML = `
+                    <div class="file-preview pdf-preview">
+                        <div class="pdf-icon">📄</div>
+                        <button onclick="window.open('${fileUrl}', '_blank')" class="preview-button">🔍 Ouvrir le PDF</button>
+                    </div>
+                `;
+            } else if (isText) {
+                // Prévisualisation de texte - lire le contenu du blob
+                try {
+                    const response = await fetch(fileUrl);
+                    const blob = await response.blob();
+                    const textContent = await blob.text();
+                    
+                    // Échapper les caractères HTML pour éviter l'injection
+                    const escapedText = textContent
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                    
+                    previewHTML = `
+                        <div class="file-preview text-preview">
+                            <div class="text-icon">📝</div>
+                            <textarea class="text-content" readonly>${escapedText}</textarea>
+                        </div>
+                    `;
+                } catch (e) {
+                    console.error('Erreur lors de la lecture du fichier texte:', e);
+                    previewHTML = `
+                        <div class="file-preview text-preview">
+                            <div class="text-icon">📝</div>
+                        </div>
+                    `;
+                }
+            }
+            
+            messageElement.innerHTML = `
+                <span class="username">${username}</span><strong>[${timestamp}]</strong><br>
+                📎 Fichier: <strong>${fileName}</strong>
+                <div class="file-info">Taille: ${fileSizeKB} KB</div>
+                ${previewHTML}
+                <a href="${fileUrl}" download="${fileName}" class="file-link">📥 Télécharger</a>
+            `;
+
+            messagesDiv.appendChild(messageElement);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            // Animation d'apparition
+            messageElement.style.opacity = '0';
+            messageElement.style.transform = 'translateY(20px)';
+            setTimeout(() => {
+                messageElement.style.transition = 'all 0.3s ease';
+                messageElement.style.opacity = '1';
+                messageElement.style.transform = 'translateY(0)';
+            }, 100);
+        }
+
         // Fonction pour mettre à jour le statut de connexion
         function updateStatus(connected) {
             if (connected) {
@@ -1247,6 +1749,7 @@
             backButton.classList.remove('active');
             messageInput.disabled = true;
             sendButton.disabled = true;
+            fileButton.disabled = true;
             usernameInput.focus();
         }
 
@@ -1257,6 +1760,7 @@
             backButton.classList.add('active');
             messageInput.disabled = false;
             sendButton.disabled = false;
+            fileButton.disabled = false;
             currentUserDiv.textContent = `🏡 Villageois: ${currentUsername}`;
             currentRoomDiv.textContent = currentRoom;
             messageInput.focus();
@@ -1267,6 +1771,18 @@
 
         // Fonction pour retourner à l'accueil
         function goBackToHome() {
+            // Informer le serveur qu'on quitte le salon
+            if (ws && ws.readyState === WebSocket.OPEN && isAuthenticated) {
+                try {
+                    ws.send(JSON.stringify({
+                        type: 'leave',
+                        room: currentRoom
+                    }));
+                } catch (error) {
+                    console.error('Erreur lors de la déconnexion du salon:', error);
+                }
+            }
+            
             // Réinitialiser les variables
             isAuthenticated = false;
             currentUsername = null;
@@ -1279,7 +1795,11 @@
             // Vider les champs
             usernameInput.value = '';
             messageInput.value = '';
-            roomSelect.value = '';
+            
+            // Sélectionner le premier salon par défaut
+            if (roomSelect.options.length > 1) {
+                roomSelect.selectedIndex = 1; // Sélectionner le premier salon (pas l'option vide)
+            }
             
             // Afficher la page d'accueil
             showUsernameSetup();
@@ -1293,15 +1813,30 @@
             const room = roomSelect.value;
 
             if (username.length === 0) {
-                alert('Veuillez saisir un pseudonyme valide.');
+                await showCustomAlert('Veuillez saisir un pseudonyme valide.', '⚠️');
                 return;
             }
 
             if (!room) {
-                alert('Veuillez sélectionner un salon.');
+                await showCustomAlert('Veuillez sélectionner un salon.', '⚠️');
                 return;
             }
 
+            // Vérifier si le salon est privé
+            const selectedOption = roomSelect.options[roomSelect.selectedIndex];
+            if (selectedOption && selectedOption.dataset.private === 'true') {
+                // Salon privé, demander le mot de passe
+                pendingPrivateRoom = { username, room };
+                openPasswordModal();
+                return;
+            }
+
+            // Salon public, connexion directe
+            await joinRoom(username, room, null);
+        }
+
+        // Fonction pour rejoindre effectivement un salon
+        async function joinRoom(username, room, password) {
             if (ws && ws.readyState === WebSocket.OPEN) {
                 try {
                     // Générer la clé de chiffrement pour ce salon
@@ -1314,13 +1849,21 @@
                     const joinMsg = `${username} a rejoint le chat`;
                     const encryptedJoinMsg = await encryptMessage(joinMsg, encryptionKey);
                     
-                    // Envoyer au serveur
-                    ws.send(JSON.stringify({
+                    // Préparer les données à envoyer
+                    const messageData = {
                         type: 'join',
                         encryptedUsername: JSON.stringify(encryptedUsernameData),
                         room: room,
                         joinMessage: JSON.stringify(encryptedJoinMsg)
-                    }));
+                    };
+                    
+                    // Ajouter le mot de passe hashé si fourni
+                    if (password) {
+                        messageData.hashedPassword = await hashPassword(password);
+                    }
+                    
+                    // Envoyer au serveur
+                    ws.send(JSON.stringify(messageData));
                     
                     // Sauvegarder localement (en clair)
                     currentUsername = username;
@@ -1338,7 +1881,7 @@
         function connectWebSocket() {
             try {
                 // Connexion locale au serveur WebSocket
-                ws = new WebSocket('ws://localhost:8080');
+                ws = new WebSocket('wss://actuftour.fr/ws/');
 
                 // Événement lors de l'ouverture de la connexion
                 ws.onopen = function(event) {
@@ -1393,11 +1936,17 @@
                                 break;
 
                             case 'error':
-                                displayMessage(data.message, 'error');
+                                await showCustomAlert(data.message, '❌');
+                                
+                                // Si c'est une erreur de mot de passe incorrect, rouvrir le modal
+                                if (data.message.includes('Mot de passe incorrect') && pendingPrivateRoom) {
+                                    openPasswordModal();
+                                }
                                 break;
 
                             case 'authenticated':
                                 isAuthenticated = true;
+                                pendingPrivateRoom = null; // Réinitialiser après succès
                                 displayMessage(`🎉 Bienvenue ${currentUsername} dans le salon ${data.room} !`, 'system');
                                 showChatInterface();
                                 break;
@@ -1425,6 +1974,38 @@
                                     } catch (e) {
                                         console.error('Erreur de déchiffrement:', e);
                                         displayMessage('[Message chiffré]', 'user', '[Utilisateur]', false);
+                                    }
+                                }
+                                break;
+
+                            case 'file':
+                                // Déchiffrer et afficher le fichier
+                                if (data.encryptedFile && data.encryptedUsername && encryptionKey) {
+                                    try {
+                                        const encFileData = JSON.parse(data.encryptedFile);
+                                        const encUsernameData = JSON.parse(data.encryptedUsername);
+                                        
+                                        const decryptedUsername = await decryptMessage(encUsernameData.encrypted, encUsernameData.iv, encryptionKey);
+                                        const decryptedFileBuffer = await decryptFile(encFileData.encrypted, encFileData.iv, encryptionKey);
+                                        
+                                        if (decryptedFileBuffer) {
+                                            const blob = new Blob([decryptedFileBuffer], { type: data.fileType });
+                                            const url = URL.createObjectURL(blob);
+                                            
+                                            const isOwnMessage = decryptedUsername === currentUsername;
+                                            displayFileMessage(url, data.fileName, data.fileSize, data.fileType, decryptedUsername, isOwnMessage);
+                                            
+                                            // Notification
+                                            if (!isOwnMessage) {
+                                                document.title = '📎 Nouveau fichier !';
+                                                setTimeout(() => {
+                                                    document.title = '🏝️ Animal Chat Island';
+                                                }, 2000);
+                                            }
+                                        }
+                                    } catch (e) {
+                                        console.error('Erreur de déchiffrement du fichier:', e);
+                                        displayMessage('[Fichier chiffré - impossible à déchiffrer]', 'error');
                                     }
                                 }
                                 break;
@@ -1460,6 +2041,45 @@
             }
         }
 
+        // Fonction pour gérer la sélection de fichier
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Limite de taille : 10MB
+            if (file.size > 10 * 1024 * 1024) {
+                displayMessage('❌ Le fichier est trop volumineux (max 10MB)', 'error');
+                fileInput.value = '';
+                return;
+            }
+
+            if (ws && ws.readyState === WebSocket.OPEN && isAuthenticated && encryptionKey) {
+                try {
+                    displayMessage(`📤 Envoi du fichier "${file.name}"...`, 'system');
+
+                    // Lire le fichier
+                    const arrayBuffer = await file.arrayBuffer();
+                    
+                    // Chiffrer le fichier
+                    const encryptedData = await encryptFile(arrayBuffer, encryptionKey);
+                    
+                    // Envoyer au serveur
+                    ws.send(JSON.stringify({
+                        type: 'file',
+                        encryptedFile: JSON.stringify(encryptedData),
+                        fileName: file.name,
+                        fileType: file.type,
+                        fileSize: file.size
+                    }));
+                    
+                    fileInput.value = '';
+                } catch (error) {
+                    console.error('Erreur lors de l\'envoi du fichier:', error);
+                    displayMessage('❌ Erreur lors de l\'envoi du fichier', 'error');
+                }
+            }
+        }
+
         // Fonction pour envoyer un message
         async function sendMessage() {
             const message = messageInput.value.trim();
@@ -1491,12 +2111,37 @@
         createRoomButton.addEventListener('click', openCreateRoomModal);
         confirmCreateRoom.addEventListener('click', createRoom);
         cancelCreateRoom.addEventListener('click', closeCreateRoomModal);
+        confirmPassword.addEventListener('click', submitPassword);
+        cancelPassword.addEventListener('click', () => {
+            closePasswordModal();
+            pendingPrivateRoom = null;
+        });
         sendButton.addEventListener('click', sendMessage);
+        fileButton.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', handleFileSelect);
 
-        // Fermer la modal en cliquant en dehors
+        // Afficher/masquer le champ de mot de passe selon la checkbox
+        privateRoomCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                passwordContainer.style.display = 'block';
+                roomPasswordInput.focus();
+            } else {
+                passwordContainer.style.display = 'none';
+                roomPasswordInput.value = '';
+            }
+        });
+
+        // Fermer les modals en cliquant en dehors
         createRoomModal.addEventListener('click', function(e) {
             if (e.target === createRoomModal) {
                 closeCreateRoomModal();
+            }
+        });
+
+        passwordModal.addEventListener('click', function(e) {
+            if (e.target === passwordModal) {
+                closePasswordModal();
+                pendingPrivateRoom = null;
             }
         });
 
@@ -1513,16 +2158,33 @@
             }
         });
 
+        roomPasswordInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                createRoom();
+            }
+        });
+
+        roomPasswordPrompt.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                submitPassword();
+            }
+        });
+
         messageInput.addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 sendMessage();
             }
         });
 
-        // Échapper pour fermer la modal
+        // Échapper pour fermer les modals
         document.addEventListener('keydown', function(event) {
-            if (event.key === 'Escape' && createRoomModal.classList.contains('active')) {
-                closeCreateRoomModal();
+            if (event.key === 'Escape') {
+                if (createRoomModal.classList.contains('active')) {
+                    closeCreateRoomModal();
+                }
+                if (passwordModal.classList.contains('active')) {
+                    closePasswordModal();
+                }
             }
         });
 
