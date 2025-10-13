@@ -1007,7 +1007,10 @@
             color: var(--text-primary);
             font-weight: bold;
             margin-bottom: 8px;
-            font-size: 14px;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
         .form-group input,
@@ -1025,36 +1028,81 @@
         
         .form-group input {
             cursor: text;
+            background: linear-gradient(135deg, var(--bg-message) 0%, rgba(255, 255, 255, 0.02) 100%);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group input:hover {
+            border-color: var(--button-secondary);
+            box-shadow: 0 0 15px rgba(65, 105, 225, 0.2), 0 4px 15px rgba(65, 105, 225, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .form-group input:focus {
+            background: linear-gradient(135deg, var(--bg-message) 0%, rgba(65, 105, 225, 0.08) 100%);
         }
         
         .form-group select {
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 20px;
-            padding-right: 45px;
-            font-weight: 600;
+            background: linear-gradient(135deg, var(--bg-message) 0%, rgba(65, 105, 225, 0.05) 100%);
+            background-image: 
+                linear-gradient(135deg, var(--bg-message) 0%, rgba(65, 105, 225, 0.05) 100%),
+                url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234169E1' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat, no-repeat;
+            background-position: 0 0, right 15px center;
+            background-size: 100% 100%, 24px;
+            padding-right: 50px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
         
         .form-group select option {
-            padding: 10px;
-            background: var(--bg-message);
+            padding: 15px;
+            background: var(--bg-chat);
             color: var(--text-primary);
+            font-weight: 600;
+            font-size: 16px;
+            border-bottom: 1px solid var(--border-color);
+            min-height: 45px;
+            line-height: 1.5;
+            border-radius: 8px;
+        }
+
+        .form-group select option:hover,
+        .form-group select option:checked {
+            background: linear-gradient(135deg, var(--button-secondary) 0%, rgba(65, 105, 225, 0.8) 100%);
+            color: white;
+            font-weight: 700;
+        }
+
+        .form-group select option:first-child {
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+            font-weight: 500;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Animation pour le select */
+        .form-group select:active {
+            transform: scale(0.99);
         }
 
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: var(--text-username);
-            box-shadow: 0 0 20px rgba(70, 130, 180, 0.3);
+            border-color: var(--button-secondary);
+            box-shadow: 0 0 25px rgba(65, 105, 225, 0.5), 0 4px 20px rgba(65, 105, 225, 0.3);
             transform: scale(1.02);
+            background: linear-gradient(135deg, var(--bg-message) 0%, rgba(65, 105, 225, 0.1) 100%);
         }
         
         .form-group select:hover {
-            border-color: var(--text-username);
-            box-shadow: 0 0 15px rgba(70, 130, 180, 0.2);
+            border-color: var(--button-secondary);
+            box-shadow: 0 0 20px rgba(65, 105, 225, 0.3), 0 4px 15px rgba(65, 105, 225, 0.2);
+            /* Pas de transform pour éviter que la flèche danse */
         }
 
         .button-group {
@@ -1076,11 +1124,23 @@
             box-shadow: 0 4px 15px rgba(50, 205, 50, 0.3);
             transition: all 0.3s ease;
             white-space: nowrap;
+            position: relative;
         }
 
         .btn-create-room:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(50, 205, 50, 0.4);
+        }
+
+        .btn-create-room:disabled {
+            background: rgba(128, 128, 128, 0.5);
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-create-room:disabled:hover {
+            transform: none;
+            box-shadow: none;
         }
 
         .btn-join-room {
@@ -1146,7 +1206,7 @@
             <button class="btn-join-room" id="setUsernameButton">🏡 Rejoindre le salon</button>
             
             <p style="margin-top: 20px; color: var(--text-secondary); font-size: 14px;">
-                🔒 Vos messages sont chiffrés de bout en bout !
+                🔒 Vos messages, pseudos et documents sont chiffrés de bout en bout !
             </p>
         </div>
 
@@ -1176,7 +1236,7 @@
         <!-- Modal pour mot de passe salon privé -->
         <div id="passwordModal" class="modal-overlay">
             <div class="modal">
-                <h2>🔒 Salon privé</h2>
+                <h2 style="margin-top: 2rem;">Salon privé</h2>
                 <div class="modal-content">
                     <p style="color: var(--text-primary); margin-bottom: 15px;">
                         Ce salon est protégé par un mot de passe.
@@ -1438,7 +1498,6 @@
         
         // Mettre à jour la liste déroulante des salons
         function updateRoomList(rooms) {
-            console.log('📋 Mise à jour de la liste des salons:', rooms);
             availableRooms = rooms;
             const currentSelection = roomSelect.value;
             roomSelect.innerHTML = '<option value="">Choisir un salon...</option>';
@@ -1465,8 +1524,6 @@
                 // Sélectionner le premier salon par défaut si on n'est pas encore connecté
                 roomSelect.selectedIndex = 1;
             }
-            
-            console.log('✅ Liste des salons mise à jour avec', rooms.length, 'salons');
         }
 
         // Ouvrir la modal de création de salon
@@ -1523,6 +1580,12 @@
             const roomName = newRoomInput.value.trim();
             const isPrivate = privateRoomCheckbox.checked;
             const password = roomPasswordInput.value.trim();
+            const username = usernameInput.value.trim();
+            
+            if (!username) {
+                await showCustomAlert('Veuillez d\'abord entrer un pseudonyme.', '⚠️');
+                return;
+            }
             
             if (!roomName) {
                 await showCustomAlert('Veuillez entrer un nom de salon valide.', '⚠️');
@@ -1544,17 +1607,36 @@
                 const messageData = {
                     type: 'createRoom',
                     roomName: roomName,
-                    isPrivate: isPrivate
+                    isPrivate: isPrivate,
+                    creatorUsername: username
                 };
                 
                 if (isPrivate) {
                     messageData.hashedPassword = await hashPassword(password);
+                    // Stocker temporairement le mot de passe pour rejoindre automatiquement
+                    pendingPrivateRoom = { username, room: roomName, password };
                 }
                 
                 ws.send(JSON.stringify(messageData));
                 
                 // Fermer la modal
                 closeCreateRoomModal();
+                
+                // Si public, rejoindre directement après création
+                if (!isPrivate) {
+                    // Attendre que le salon soit créé et la liste mise à jour
+                    setTimeout(async () => {
+                        roomSelect.value = roomName;
+                        await joinRoom(username, roomName, null);
+                    }, 300);
+                } else {
+                    // Si privé, rejoindre avec le mot de passe
+                    setTimeout(async () => {
+                        roomSelect.value = roomName;
+                        await joinRoom(username, roomName, password);
+                        pendingPrivateRoom = null;
+                    }, 300);
+                }
                 
                 // Afficher un message de succès
                 const lockIcon = isPrivate ? '🔒' : '🏠';
@@ -1783,6 +1865,9 @@
                 }
             }
             
+            // Sauvegarder le pseudo actuel
+            const savedUsername = currentUsername;
+            
             // Réinitialiser les variables
             isAuthenticated = false;
             currentUsername = null;
@@ -1792,14 +1877,17 @@
             // Vider les messages
             messagesDiv.innerHTML = '';
             
-            // Vider les champs
-            usernameInput.value = '';
+            // Pré-remplir le champ username avec le pseudo précédent
+            usernameInput.value = savedUsername || '';
             messageInput.value = '';
             
             // Sélectionner le premier salon par défaut
             if (roomSelect.options.length > 1) {
                 roomSelect.selectedIndex = 1; // Sélectionner le premier salon (pas l'option vide)
             }
+            
+            // Mettre à jour l'état du bouton créer
+            updateCreateRoomButton();
             
             // Afficher la page d'accueil
             showUsernameSetup();
@@ -1881,7 +1969,7 @@
         function connectWebSocket() {
             try {
                 // Connexion locale au serveur WebSocket
-                ws = new WebSocket('wss://actuftour.fr/ws/');
+                ws = new WebSocket('ws://localhost:8080');
 
                 // Événement lors de l'ouverture de la connexion
                 ws.onopen = function(event) {
@@ -1896,7 +1984,6 @@
 
                         switch(data.type) {
                             case 'roomList':
-                                console.log('📨 Réception de la liste des salons:', data.rooms);
                                 updateRoomList(data.rooms);
                                 // Si un salon vient d'être créé, le sélectionner automatiquement
                                 if (data.newRoom) {
@@ -1908,7 +1995,6 @@
                             case 'userCount':
                                 // Mettre à jour le nombre d'utilisateurs connectés
                                 userCountDiv.textContent = data.count;
-                                console.log('👥 Nombre d\'utilisateurs dans le salon:', data.count);
                                 break;
 
                             case 'system':
@@ -2188,11 +2274,33 @@
             }
         });
 
+        // Vérifier si on peut activer le bouton "Créer un salon"
+        function updateCreateRoomButton() {
+            const username = usernameInput.value.trim();
+            if (username.length > 0) {
+                createRoomButton.disabled = false;
+                createRoomButton.style.opacity = '1';
+                createRoomButton.style.cursor = 'pointer';
+                createRoomButton.title = 'Créer un nouveau salon';
+            } else {
+                createRoomButton.disabled = true;
+                createRoomButton.style.opacity = '0.5';
+                createRoomButton.style.cursor = 'not-allowed';
+                createRoomButton.title = '⚠️ Veuillez d\'abord entrer un pseudonyme';
+            }
+        }
+
+        // Écouter les changements dans l'input du pseudo
+        usernameInput.addEventListener('input', updateCreateRoomButton);
+
         // Démarrage de la connexion WebSocket au chargement de la page
         window.addEventListener('load', function() {
             displayMessage('🚀 Démarrage de l\'application...', 'system');
             showUsernameSetup();
             connectWebSocket();
+            
+            // Désactiver le bouton "Créer" au démarrage
+            updateCreateRoomButton();
 
             // Petit délai pour l'animation
             setTimeout(() => {

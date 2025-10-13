@@ -9,6 +9,49 @@ console.log('Serveur WebSocket en écoute sur le port 8080...');
 const rooms = new Map(); // Map<roomName, Set<ws>>
 const availableRooms = new Set(['Général']); // Salon par défaut
 const roomPasswords = new Map(); // Map<roomName, hashedPassword> - pour les salons privés
+const roomTimers = new Map(); // Map<roomName, timeoutId> - pour supprimer les salons vides
+
+// Fonction pour démarrer le timer de suppression d'un salon vide
+function startRoomDeletionTimer(roomName) {
+    // Ne pas supprimer le salon par défaut "Général"
+    if (roomName === 'Général') return;
+    
+    // Annuler le timer existant s'il y en a un
+    if (roomTimers.has(roomName)) {
+        clearTimeout(roomTimers.get(roomName));
+    }
+    
+    // Démarrer un nouveau timer de 1 minute (60000 ms)
+    const timerId = setTimeout(() => {
+        const roomClients = rooms.get(roomName);
+        
+        // Vérifier que le salon est toujours vide
+        if (!roomClients || roomClients.size === 0) {
+            console.log(`⏰ Suppression du salon vide: ${roomName}`);
+            
+            // Supprimer le salon
+            availableRooms.delete(roomName);
+            rooms.delete(roomName);
+            roomPasswords.delete(roomName);
+            roomTimers.delete(roomName);
+            
+            // Informer tous les clients
+            broadcastRoomList();
+        }
+    }, 60000); // 1 minute
+    
+    roomTimers.set(roomName, timerId);
+    console.log(`⏲️ Timer de suppression démarré pour le salon: ${roomName} (1 minute)`);
+}
+
+// Fonction pour annuler le timer de suppression d'un salon
+function cancelRoomDeletionTimer(roomName) {
+    if (roomTimers.has(roomName)) {
+        clearTimeout(roomTimers.get(roomName));
+        roomTimers.delete(roomName);
+        console.log(`⏹️ Timer de suppression annulé pour le salon: ${roomName}`);
+    }
+}
 
 // Fonction pour broadcast la liste des salons à tous les clients
 function broadcastRoomList(newRoom = null) {
@@ -65,6 +108,8 @@ wss.on('connection', function connection(ws) {
     ws.on('message', function incoming(data) {
         try {
             const messageData = JSON.parse(data);
+            
+            console.log(`📩 Message reçu - Type: ${messageData.type}, Auth: ${ws.isAuthenticated}, Room: ${ws.room}`);
 
             // Gestion de la création de salon
             if (messageData.type === 'createRoom') {
@@ -150,6 +195,9 @@ wss.on('connection', function connection(ws) {
                     rooms.set(roomName, new Set());
                 }
                 
+                // Annuler le timer de suppression si quelqu'un rejoint
+                cancelRoomDeletionTimer(roomName);
+                
                 // Ajouter le client au salon
                 rooms.get(roomName).add(ws);
 
@@ -190,6 +238,8 @@ wss.on('connection', function connection(ws) {
                 if (roomClients) {
                     roomClients.delete(ws);
                     
+                    console.log(`📊 Salon "${roomName}" a maintenant ${roomClients.size} utilisateur(s)`);
+                    
                     // Mettre à jour le compteur d'utilisateurs
                     broadcastUserCount(roomName);
                     
@@ -204,9 +254,10 @@ wss.on('connection', function connection(ws) {
                         }
                     });
                     
-                    // Supprimer le salon s'il est vide
+                    // Si le salon est vide, démarrer le timer de suppression
                     if (roomClients.size === 0) {
-                        rooms.delete(roomName);
+                        console.log(`🔴 Salon "${roomName}" est vide, lancement du timer de suppression...`);
+                        startRoomDeletionTimer(roomName);
                     }
                 }
                 
@@ -286,6 +337,8 @@ wss.on('connection', function connection(ws) {
             if (roomClients) {
                 roomClients.delete(ws);
                 
+                console.log(`📊 Salon "${roomName}" a maintenant ${roomClients.size} utilisateur(s) (déconnexion)`);
+                
                 // Mettre à jour le compteur d'utilisateurs
                 broadcastUserCount(roomName);
                 
@@ -300,13 +353,14 @@ wss.on('connection', function connection(ws) {
                     }
                 });
                 
-                // Supprimer le salon s'il est vide
+                // Si le salon est vide, démarrer le timer de suppression
                 if (roomClients.size === 0) {
-                    rooms.delete(roomName);
+                    console.log(`🔴 Salon "${roomName}" est vide (déconnexion), lancement du timer de suppression...`);
+                    startRoomDeletionTimer(roomName);
                 }
             }
         } else {
-            console.log('Client déconnecté');
+            console.log('Client déconnecté (pas authentifié)');
         }
     });
 
