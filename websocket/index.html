@@ -1969,7 +1969,7 @@
         function connectWebSocket() {
             try {
                 // Connexion locale au serveur WebSocket
-                ws = new WebSocket('ws://localhost:8080');
+                ws = new WebSocket('wss://actuftour.fr/ws');
 
                 // Événement lors de l'ouverture de la connexion
                 ws.onopen = function(event) {
